@@ -33,7 +33,7 @@ def allowed_file(filename):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("home.html")
 
 
 @app.route("/remove", methods=["POST"])
@@ -88,7 +88,7 @@ def manual_editor():
     """
     Render the manual editor page.
     """
-    return render_template("manual_editor.html")
+    return render_template("editor.html")
 
 
 @app.route("/upload_for_manual", methods=["POST"])
@@ -116,7 +116,7 @@ def upload_for_manual():
     
     # Redirect to manual editor with the image
     image_url = f"/static/uploads/input/{filename}"
-    return render_template("manual_editor.html", image_path=image_url)
+    return render_template("editor.html", image_path=image_url)
 
 
 @app.route("/save_manual_edit", methods=["POST"])
@@ -151,7 +151,7 @@ def result_manual():
     """
     image_path = request.args.get('image', '')
     return render_template(
-        "result_manual.html",
+        "manual_result.html",
         output_image=image_path
     )
 
