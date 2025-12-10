@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/static/ice.png" />
+    <title>EraseThatShii</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #0a0a0a;
+        color: #e0e0e0;
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 48px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 48px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #2a2a2a;
+      }
+
+      h1 {
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+        color: #ffffff;
+      }
+
+      .subtitle {
+        color: #888;
+        font-size: 14px;
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+        align-items: start;
+      }
+
+      .image-block {
+        width: 100%;
+      }
+
+      .image-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+
+      .image-box {
+        width: 100%;
+        height: 450px;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        background: linear-gradient(45deg, #0f0f0f 25%, transparent 25%),
+          linear-gradient(-45deg, #0f0f0f 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #0f0f0f 75%),
+          linear-gradient(-45deg, transparent 75%, #0f0f0f 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .image-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+
+      .zoom-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .zoom-btn {
+        width: 32px;
+        height: 32px;
+        background: #2a2a2a;
+        border: 1px solid #404040;
+        color: #e0e0e0;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s ease;
+      }
+
+      .zoom-btn:hover {
+        background: #333;
+        border-color: #505050;
+      }
+
+      .zoom-level {
+        min-width: 60px;
+        text-align: center;
+        font-size: 13px;
+        color: #888;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #404040;
+        padding-top: 60px;
+      }
+
+      .divider svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-primary {
+        background: #fff;
+        color: #000;
+      }
+
+      .btn-primary:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: #e0e0e0;
+        border: 1px solid #2a2a2a;
+      }
+
+      .btn-secondary:hover {
+        background: #1a1a1a;
+        border-color: #404040;
+      }
+
+      .info-box {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        padding: 16px;
+        border-radius: 6px;
+      }
+
+      .info-box p {
+        font-size: 12px;
+        color: #888;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .info-box p + p {
+        margin-top: 8px;
+      }
+
+      .info-box strong {
+        color: #e0e0e0;
+      }
+
+      @media (max-width: 968px) {
+        .comparison {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+
+        .divider {
+          transform: rotate(90deg);
+          padding-top: 0;
+        }
+
+        .actions {
+          grid-template-columns: 1fr;
+        }
+
+        .image-box {
+          height: 350px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          padding: 32px 24px;
+        }
+
+        .image-box {
+          height: 300px;
+        }
+      }
+
+      /* Download Format Selection Styles */
+      .download-section {
+        margin-bottom: 20px;
+      }
+
+      .download-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .format-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .format-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        background: transparent;
+        color: #e0e0e0;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+
+      .format-btn:hover {
+        background: #1a1a1a;
+        border-color: #404040;
+      }
+
+      .format-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      @media (max-width: 968px) {
+        .format-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          margin-bottom: 24px;
+        "
+      >
+        <img
+          src="/static/ice.png"
+          alt="EraseThatShii Logo"
+          style="width: 60px; height: auto"
+        />
+        <div>
+          <h1 style="margin: 0">Processing Complete</h1>
+          <p class="subtitle" style="margin: 4px 0 0 0">
+            Background successfully removed
+          </p>
+        </div>
+      </header>
+
+      <div class="comparison">
+        <div class="image-block">
+          <label class="image-label">Original</label>
+          <div class="image-box">
+            <img
+              id="original-img"
+              src="/static/{{ input_image }}"
+              alt="Original image"
+            />
+          </div>
+          <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomOut('original')">−</button>
+            <span class="zoom-level" id="original-zoom">100%</span>
+            <button class="zoom-btn" onclick="zoomIn('original')">+</button>
+            <button class="zoom-btn" onclick="resetZoom('original')">⟳</button>
+          </div>
+        </div>
+
+        <div class="divider">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
+
+        <div class="image-block">
+          <label class="image-label">Result</label>
+          <div class="image-box">
+            <img
+              id="result-img"
+              src="/static/{{ output_image }}"
+              alt="Processed image"
+            />
+          </div>
+          <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomOut('result')">−</button>
+            <span class="zoom-level" id="result-zoom">100%</span>
+            <button class="zoom-btn" onclick="zoomIn('result')">+</button>
+            <button class="zoom-btn" onclick="resetZoom('result')">⟳</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download Format Selection -->
+      <div class="download-section">
+        <label class="download-label">Download As</label>
+        <div class="format-grid">
+          <button class="format-btn" onclick="downloadAs('png')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            PNG
+          </button>
+          <button class="format-btn" onclick="downloadAs('svg')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            SVG
+          </button>
+          <button class="format-btn" onclick="downloadAs('ico')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            ICO
+          </button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a
+          href="/manual_editor?image=/static/{{ output_image }}"
+          class="btn-secondary"
+        >
+          Manual Edit
+        </a>
+        <a href="/" class="btn-secondary"> Process Another </a>
+      </div>
+
+      <div class="info-box">
+        <p>
+          <strong>Note:</strong> The result has a transparent background. The
+          checkered pattern indicates transparency.
+        </p>
+        <p>
+          <strong>Manual Edit:</strong> Click to refine areas by hand if needed.
+        </p>
+        <p>
+          <strong>Formats:</strong> PNG preserves transparency. SVG and ICO are
+          converted from the PNG result.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const zoomStates = {
+        original: 1,
+        result: 1,
+      };
+
+      function zoomIn(id) {
+        zoomStates[id] = Math.min(zoomStates[id] + 0.25, 3);
+        updateZoom(id);
+      }
+
+      function zoomOut(id) {
+        zoomStates[id] = Math.max(zoomStates[id] - 0.25, 0.5);
+        updateZoom(id);
+      }
+
+      function resetZoom(id) {
+        zoomStates[id] = 1;
+        updateZoom(id);
+      }
+
+      function updateZoom(id) {
+        const img = document.getElementById(`${id}-img`);
+        const zoomLevel = document.getElementById(`${id}-zoom`);
+
+        img.style.transform = `scale(${zoomStates[id]})`;
+        zoomLevel.textContent = `${Math.round(zoomStates[id] * 100)}%`;
+      }
+
+      function downloadAs(format) {
+        const outputImage = "{{ output_image }}";
+        const imagePath = `/static/${outputImage}`;
+
+        if (format === "png") {
+          // Direct download for PNG
+          const link = document.createElement("a");
+          link.href = imagePath;
+          link.download = outputImage.split("/").pop();
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          // Convert and download for SVG and ICO
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+
+            if (format === "svg") {
+              convertToSVG(canvas, img);
+            } else if (format === "ico") {
+              convertToICO(canvas);
+            }
+          };
+          img.src = imagePath;
+        }
+      }
+
+      function convertToSVG(canvas, img) {
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", canvas.width);
+        svg.setAttribute("height", canvas.height);
+        svg.setAttribute("xmlns", svgNS);
+
+        const image = document.createElementNS(svgNS, "image");
+        image.setAttribute("width", canvas.width);
+        image.setAttribute("height", canvas.height);
+        image.setAttribute("href", canvas.toDataURL("image/png"));
+
+        svg.appendChild(image);
+
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([svgData], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "{{ output_image }}"
+          .split("/")
+          .pop()
+          .replace(".png", ".svg");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      function convertToICO(canvas) {
+        // Create 32x32 version for ICO
+        const icoCanvas = document.createElement("canvas");
+        icoCanvas.width = 32;
+        icoCanvas.height = 32;
+        const icoCtx = icoCanvas.getContext("2d");
+        icoCtx.drawImage(canvas, 0, 0, 32, 32);
+
+        icoCanvas.toBlob(function (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "{{ output_image }}"
+            .split("/")
+            .pop()
+            .replace(".png", ".ico");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      }
+    </script>
+  </body>
+</html>

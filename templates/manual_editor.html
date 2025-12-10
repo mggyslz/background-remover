@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/ice.png">
+    <title>EraseThatShii</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 48px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            padding: 16px;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tool-btn {
+            padding: 10px 16px;
+            border: 1px solid #2a2a2a;
+            background: #1a1a1a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .tool-btn:hover {
+            border-color: #404040;
+            background: #222;
+            color: #e0e0e0;
+        }
+
+        .tool-btn.active {
+            background: #2a2a2a;
+            color: #fff;
+            border-color: #505050;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slider-group input[type="range"] {
+            width: 120px;
+            height: 4px;
+            background: #2a2a2a;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-group span {
+            font-size: 12px;
+            min-width: 30px;
+            text-align: center;
+            color: #e0e0e0;
+        }
+
+        .canvas-container {
+            margin-bottom: 24px;
+        }
+
+        .canvas-box {
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            margin: 0 auto;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #0f0f0f 25%, transparent 25%),
+                        linear-gradient(-45deg, #0f0f0f 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #0f0f0f 75%),
+                        linear-gradient(-45deg, transparent 75%, #0f0f0f 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            position: relative;
+        }
+
+        #editor-canvas {
+            display: block;
+            cursor: crosshair;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            color: #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: #333;
+            border-color: #505050;
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .action-buttons .btn-primary,
+        .action-buttons .btn-secondary {
+            width: 200px; /* same rectangular size */
+        }
+
+        .btn-primary, .btn-secondary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #e0e0e0;
+            border: 1px solid #2a2a2a;
+        }
+
+        .btn-secondary:hover {
+            background: #1a1a1a;
+            border-color: #404040;
+        }
+
+        .info-box {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 8px 0;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #e0e0e0;
+        }
+
+        .info-box ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .info-box li {
+            margin: 4px 0;
+        }
+
+        .cursor-preview {
+            position: fixed;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+        }
+
+        .cursor-preview.restore-mode {
+            border-color: rgba(150, 150, 150, 0.6);
+        }
+
+        @media (max-width: 968px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .canvas-box {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            .toolbar {
+                padding: 12px;
+            }
+
+            .canvas-box {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 48px; padding-bottom: 24px; border-bottom: 1px solid #2a2a2a;">
+        <img src="/static/ice.png" alt="EraseThatShii Logo" style="width: 70px; height: auto;">
+        <div style="text-align: left;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #fff;">EraseThatShii</h1>
+            <h2 style="font-size: 20px; font-weight: 500; color: #aaa; margin: 4px 0 0 0;">Manual Editor</h2>
+            <p class="subtitle" style="margin: 8px 0 0 0; font-size: 14px; color: #ccc;">Paint to remove your shit</p>
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <div class="tool-group">
+            <button class="tool-btn active" id="remove-btn" onclick="setMode('remove')">
+                Remove Background
+            </button>
+            <button class="tool-btn" id="restore-btn" onclick="setMode('restore')">
+                Restore Areas
+            </button>
+        </div>
+
+        <div class="slider-group">
+            <label for="brush-size">Brush Size</label>
+            <input type="range" id="brush-size" min="5" max="100" value="30">
+            <span id="brush-size-value">30</span>
+        </div>
+
+        <div class="tool-group">
+            <button class="tool-btn" onclick="undoLast()">Undo</button>
+            <button class="tool-btn" onclick="resetCanvas()">Reset</button>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <div class="canvas-box">
+            <canvas id="editor-canvas"></canvas>
+        </div>
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomOutCanvas()">−</button>
+            <span class="zoom-level" id="canvas-zoom">100%</span>
+            <button class="zoom-btn" onclick="zoomInCanvas()">+</button>
+            <button class="zoom-btn" onclick="resetCanvasZoom()">⟳</button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn-primary" onclick="saveEdited()">Save Result</button>
+        <a href="/" class="btn-secondary">Back to Home</a>
+    </div>
+
+    <div class="info-box">
+        <p><strong>Instructions:</strong></p>
+        <ul>
+            <li>Click and drag to paint areas</li>
+            <li>Use Remove Background mode to erase unwanted parts</li>
+            <li>Use Restore Areas mode to bring back parts you removed</li>
+            <li>Adjust brush size as needed</li>
+            <li>The checkered pattern indicates transparency</li>
+        </ul>
+    </div>
+</div>
+
+<div class="cursor-preview" id="cursor-preview"></div>
+
+<script>
+const canvas = document.getElementById('editor-canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const cursorPreview = document.getElementById('cursor-preview');
+
+let isDrawing = false;
+let currentMode = 'remove';
+let brushSize = 30;
+let originalImage = null;
+let history = [];
+const MAX_HISTORY = 20;
+let lastX = 0;
+let lastY = 0;
+let canvasScale = 1;
+
+const urlParams = new URLSearchParams(window.location.search);
+const imagePath = urlParams.get('image') || '{{ image_path }}' || '/static/{{ output_image }}';
+
+const img = new Image();
+img.crossOrigin = 'anonymous';
+img.onload = function() {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    originalImage = img;
+    saveState();
+};
+img.onerror = function() {
+    alert('Error loading image. Please try uploading again.');
+};
+img.src = imagePath;
+
+document.getElementById('brush-size').addEventListener('input', (e) => {
+    brushSize = parseInt(e.target.value);
+    document.getElementById('brush-size-value').textContent = brushSize;
+});
+
+function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('remove-btn').classList.toggle('active', mode === 'remove');
+    document.getElementById('restore-btn').classList.toggle('active', mode === 'restore');
+    cursorPreview.classList.toggle('restore-mode', mode === 'restore');
+}
+
+function saveState() {
+    const state = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    history.push(state);
+    if (history.length > MAX_HISTORY) {
+        history.shift();
+    }
+}
+
+function undoLast() {
+    if (history.length > 1) {
+        history.pop();
+        const previousState = history[history.length - 1];
+        ctx.putImageData(previousState, 0, 0);
+    }
+}
+
+function resetCanvas() {
+    if (originalImage) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalImage, 0, 0);
+        history = [];
+        saveState();
+    }
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseleave', stopDrawing);
+
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    lastX = (touch.clientX - rect.left) * scaleX;
+    lastY = (touch.clientY - rect.top) * scaleY;
+    
+    const mouseEvent = new MouseEvent('mousedown', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+});
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent('mouseup', {});
+    canvas.dispatchEvent(mouseEvent);
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    cursorPreview.style.left = e.clientX - brushSize/2 + 'px';
+    cursorPreview.style.top = e.clientY - brushSize/2 + 'px';
+    cursorPreview.style.width = brushSize + 'px';
+    cursorPreview.style.height = brushSize + 'px';
+    cursorPreview.style.display = 'block';
+});
+
+canvas.addEventListener('mouseleave', () => {
+    cursorPreview.style.display = 'none';
+});
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    lastX = (e.clientX - rect.left) * scaleX;
+    lastY = (e.clientY - rect.top) * scaleY;
+    
+    saveState();
+    draw(e);
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    if (currentMode === 'remove') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        
+    } else {
+        if (!originalImage) return;
+        
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
+        
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        
+        ctx.clip();
+        ctx.drawImage(originalImage, 0, 0);
+        ctx.restore();
+    }
+
+    lastX = x;
+    lastY = y;
+    
+    ctx.globalCompositeOperation = 'source-over';
+}
+
+async function saveEdited() {
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    
+    const formData = new FormData();
+    formData.append('image', blob, 'edited.png');
+    
+    try {
+        const response = await fetch('/save_manual_edit', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            alert('Image saved successfully!');
+            window.location.href = `/result_manual?image=${data.output_path}`;
+        } else {
+            alert('Error saving image');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving image');
+    }
+}
+
+function zoomInCanvas() {
+    canvasScale = Math.min(canvasScale + 0.25, 3);
+    updateCanvasZoom();
+}
+
+function zoomOutCanvas() {
+    canvasScale = Math.max(canvasScale - 0.25, 0.5);
+    updateCanvasZoom();
+}
+
+function resetCanvasZoom() {
+    canvasScale = 1;
+    updateCanvasZoom();
+}
+
+function updateCanvasZoom() {
+    canvas.style.transform = `scale(${canvasScale})`;
+    document.getElementById('canvas-zoom').textContent = `${Math.round(canvasScale * 100)}%`;
+}
+
+function downloadEdited() {
+    canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'manually-edited-' + Date.now() + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 'image/png');
+}
+</script>
+
+</body>
+</html>

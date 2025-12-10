@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/ice.png">
+    <title>EraseThatShii</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 48px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .mode-btn {
+            padding: 16px;
+            border: 2px solid #2a2a2a;
+            background: #1a1a1a;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #888;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            border-color: #404040;
+            background: #222;
+        }
+
+        .mode-btn.active {
+            background: #2a2a2a;
+            color: #fff;
+            border-color: #404040;
+        }
+
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            border: 2px dashed #2a2a2a;
+            background: #0f0f0f;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .upload-area:hover {
+            border-color: #404040;
+            background: #151515;
+        }
+
+        .upload-area.dragover {
+            border-color: #505050;
+            background: #1a1a1a;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            stroke: #666;
+        }
+
+        .upload-text {
+            font-size: 15px;
+            color: #e0e0e0;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        .preview-container {
+            margin-bottom: 24px;
+        }
+
+        .image-box {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #0f0f0f 25%, transparent 25%),
+                        linear-gradient(-45deg, #0f0f0f 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #0f0f0f 75%),
+                        linear-gradient(-45deg, transparent 75%, #0f0f0f 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            color: #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: #333;
+            border-color: #505050;
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .quality-options {
+            margin-bottom: 24px;
+        }
+
+        .quality-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            border: 1px solid #2a2a2a;
+            background: #1a1a1a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #404040;
+            background: #222;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) {
+            border-color: #505050;
+            background: #2a2a2a;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .radio-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .radio-text strong {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .radio-text small {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .btn-primary, .btn-secondary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .btn-primary:disabled {
+            background: #2a2a2a;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #e0e0e0;
+            border: 1px solid #2a2a2a;
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #1a1a1a;
+            border-color: #404040;
+        }
+
+        .info-box {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 24px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #e0e0e0;
+        }
+
+        .loader {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            .mode-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .image-box {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+<header style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 48px; padding-bottom: 24px; border-bottom: 1px solid #2a2a2a;">
+    <img src="/static/ice.png" alt="EraseThatShii Logo" style="width: 60px; height: auto;">
+    <div style="text-align: left;">
+        <h1 style="margin: 0;">EraseThatShii</h1>
+        <p class="subtitle" style="margin: 4px 0 0 0;">Removes shit from images</p>
+    </div>
+</header>
+
+
+    <div class="mode-selector">
+        <button class="mode-btn active" onclick="showMode('ai')" id="ai-mode-btn">
+            Auto Removal
+        </button>
+        <button class="mode-btn" onclick="showMode('manual')" id="manual-mode-btn">
+            Manual Editor
+        </button>
+    </div>
+
+    <form action="/remove" method="POST" enctype="multipart/form-data" id="ai-form">
+        <label class="upload-area" for="file">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            <span class="upload-text">Click to upload or drag and drop</span>
+            <span class="upload-hint">PNG, JPG up to 16MB</span>
+            <input id="file" type="file" name="image" accept="image/*" required>
+        </label>
+
+        <div id="preview-container" class="preview-container" style="display:none;">
+            <div class="image-box">
+                <img id="preview" alt="Preview">
+            </div>
+            
+            <div class="zoom-controls">
+                <button type="button" class="zoom-btn" onclick="zoomOut()">−</button>
+                <span class="zoom-level" id="zoom-level">100%</span>
+                <button type="button" class="zoom-btn" onclick="zoomIn()">+</button>
+                <button type="button" class="zoom-btn" onclick="resetZoom()">⟳</button>
+            </div>
+            
+            <button type="button" class="btn-secondary" onclick="removePreview()">
+                Remove Image
+            </button>
+        </div>
+
+        <div class="quality-options">
+            <label class="quality-label">Quality Mode</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="mode" value="best" checked>
+                    <span class="radio-text">
+                        <strong>Best Quality</strong>
+                        <small>Highest accuracy, recommended</small>
+                    </span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="mode" value="portrait">
+                    <span class="radio-text">
+                        <strong>Portrait Mode</strong>
+                        <small>Optimized for people</small>
+                    </span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="mode" value="advanced">
+                    <span class="radio-text">
+                        <strong>Ultra Quality</strong>
+                        <small>Multi-pass processing, slower</small>
+                    </span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="mode" value="fast">
+                    <span class="radio-text">
+                        <strong>Fast Mode</strong>
+                        <small>Quick processing</small>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn" disabled>
+            <span id="btn-text">Process Image</span>
+            <svg id="btn-loader" class="loader" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+        </button>
+    </form>
+
+    <form action="/upload_for_manual" method="POST" enctype="multipart/form-data" id="manual-form" style="display:none;">
+        <label class="upload-area" for="manual-file">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            <span class="upload-text">Upload image for manual editing</span>
+            <span class="upload-hint">PNG, JPG up to 16MB</span>
+            <input id="manual-file" type="file" name="image" accept="image/*" required>
+        </label>
+
+        <div id="manual-preview-container" class="preview-container" style="display:none;">
+            <div class="image-box">
+                <img id="manual-preview" alt="Preview">
+            </div>
+            
+            <div class="zoom-controls">
+                <button type="button" class="zoom-btn" onclick="manualZoomOut()">−</button>
+                <span class="zoom-level" id="manual-zoom-level">100%</span>
+                <button type="button" class="zoom-btn" onclick="manualZoomIn()">+</button>
+                <button type="button" class="zoom-btn" onclick="manualResetZoom()">⟳</button>
+            </div>
+            
+            <button type="button" class="btn-secondary" onclick="removeManualPreview()">
+                Remove Image
+            </button>
+        </div>
+
+        <button type="submit" class="btn-primary" id="manual-submit-btn" disabled>
+            Open Manual Editor
+        </button>
+    </form>
+
+    <div class="info-box">
+        <p><strong>Auto Removal:</strong> Automatic background removal obviously</p>
+        <p style="margin-top: 8px;"><strong>Manual Editor:</strong> Draw to manually remove or restore background areas</p>
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById("file");
+const preview = document.getElementById("preview");
+const previewContainer = document.getElementById("preview-container");
+const submitBtn = document.getElementById("submit-btn");
+const uploadArea = document.querySelector(".upload-area");
+const btnText = document.getElementById("btn-text");
+const btnLoader = document.getElementById("btn-loader");
+
+const manualFileInput = document.getElementById("manual-file");
+const manualPreview = document.getElementById("manual-preview");
+const manualPreviewContainer = document.getElementById("manual-preview-container");
+const manualSubmitBtn = document.getElementById("manual-submit-btn");
+
+let zoomScale = 1;
+let manualZoomScale = 1;
+
+function showMode(mode) {
+    const aiForm = document.getElementById('ai-form');
+    const manualForm = document.getElementById('manual-form');
+    const aiBtn = document.getElementById('ai-mode-btn');
+    const manualBtn = document.getElementById('manual-mode-btn');
+
+    if (mode === 'ai') {
+        aiForm.style.display = 'block';
+        manualForm.style.display = 'none';
+        aiBtn.classList.add('active');
+        manualBtn.classList.remove('active');
+    } else {
+        aiForm.style.display = 'none';
+        manualForm.style.display = 'block';
+        aiBtn.classList.remove('active');
+        manualBtn.classList.add('active');
+    }
+}
+
+fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.onload = () => {
+            previewContainer.style.display = "block";
+            submitBtn.disabled = false;
+        };
+    }
+};
+
+function removePreview() {
+    fileInput.value = "";
+    previewContainer.style.display = "none";
+    submitBtn.disabled = true;
+    resetZoom();
+}
+
+manualFileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+        manualPreview.src = URL.createObjectURL(file);
+        manualPreview.onload = () => {
+            manualPreviewContainer.style.display = "block";
+            manualSubmitBtn.disabled = false;
+        };
+    }
+};
+
+function removeManualPreview() {
+    manualFileInput.value = "";
+    manualPreviewContainer.style.display = "none";
+    manualSubmitBtn.disabled = true;
+    manualResetZoom();
+}
+
+function zoomIn() {
+    zoomScale = Math.min(zoomScale + 0.25, 3);
+    preview.style.transform = `scale(${zoomScale})`;
+    document.getElementById('zoom-level').textContent = `${Math.round(zoomScale * 100)}%`;
+}
+
+function zoomOut() {
+    zoomScale = Math.max(zoomScale - 0.25, 0.5);
+    preview.style.transform = `scale(${zoomScale})`;
+    document.getElementById('zoom-level').textContent = `${Math.round(zoomScale * 100)}%`;
+}
+
+function resetZoom() {
+    zoomScale = 1;
+    preview.style.transform = 'scale(1)';
+    document.getElementById('zoom-level').textContent = '100%';
+}
+
+function manualZoomIn() {
+    manualZoomScale = Math.min(manualZoomScale + 0.25, 3);
+    manualPreview.style.transform = `scale(${manualZoomScale})`;
+    document.getElementById('manual-zoom-level').textContent = `${Math.round(manualZoomScale * 100)}%`;
+}
+
+function manualZoomOut() {
+    manualZoomScale = Math.max(manualZoomScale - 0.25, 0.5);
+    manualPreview.style.transform = `scale(${manualZoomScale})`;
+    document.getElementById('manual-zoom-level').textContent = `${Math.round(manualZoomScale * 100)}%`;
+}
+
+function manualResetZoom() {
+    manualZoomScale = 1;
+    manualPreview.style.transform = 'scale(1)';
+    document.getElementById('manual-zoom-level').textContent = '100%';
+}
+
+document.querySelector('#ai-form').onsubmit = () => {
+    btnText.textContent = "Processing...";
+    btnLoader.style.display = "inline-block";
+    submitBtn.disabled = true;
+};
+
+uploadArea.ondragover = uploadArea.ondragenter = (e) => {
+    e.preventDefault();
+    uploadArea.classList.add("dragover");
+};
+
+uploadArea.ondragleave = uploadArea.ondragend = () => {
+    uploadArea.classList.remove("dragover");
+};
+
+uploadArea.ondrop = (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+        fileInput.files = e.dataTransfer.files;
+        preview.src = URL.createObjectURL(file);
+        preview.onload = () => {
+            previewContainer.style.display = "block";
+            submitBtn.disabled = false;
+        };
+    }
+};
+</script>
+
+</body>
+</html>
