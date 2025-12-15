@@ -27,3 +27,5 @@ static/uploads/manual/
 
 # Local config
 *.env
+
+models/

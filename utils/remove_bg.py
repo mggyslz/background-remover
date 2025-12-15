@@ -1,6 +1,7 @@
 from rembg import remove, new_session
 from PIL import Image, ImageFilter, ImageEnhance
 import numpy as np
+import os
 
 
 def remove_background(input_path, output_path, mode='best'):
@@ -48,8 +49,11 @@ def remove_background(input_path, output_path, mode='best'):
         bg_threshold = 20
         erode_size = 12
 
-    # Create session (IMPORTANT FIX)
-    session = new_session(model_name=model)
+    # Get the model path from local models folder
+    model_path = get_local_model_path(model)
+
+    # Create session with local model
+    session = new_session(model_path=model_path, providers=['CPUExecutionProvider'])
 
     # Background removal
     output = remove(
@@ -79,6 +83,28 @@ def remove_background(input_path, output_path, mode='best'):
     return output_path
 
 
+def get_local_model_path(model_name):
+    """
+    Get the path to local model file.
+    Maps model names to their .onnx files in the models folder.
+    """
+    model_mapping = {
+        'isnet-general-use': 'isnet-general-use.onnx',
+        'u2net_human_seg': 'u2net_human_seg.onnx',
+        'u2net': 'u2net.onnx',
+        'u2netp': 'u2netp.onnx'
+    }
+    
+    models_dir = os.path.join(os.path.dirname(__file__), '../models')
+    model_file = model_mapping.get(model_name, f"{model_name}.onnx")
+    model_path = os.path.join(models_dir, model_file)
+    
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found: {model_path}")
+    
+    return model_path
+
+
 def refine_edges(img):
     """Smooth edges by softening alpha channel."""
     if img.mode != 'RGBA':
@@ -98,8 +124,11 @@ def remove_background_with_feather(input_path, output_path, feather_amount=2):
     if input_img.mode not in ('RGB', 'RGBA'):
         input_img = input_img.convert('RGB')
 
-    # Session for ISNet
-    session = new_session(model_name='isnet-general-use')
+    # Session for ISNet with local model
+    session = new_session(
+        model_path=get_local_model_path('isnet-general-use'),
+        providers=['CPUExecutionProvider']
+    )
 
     output = remove(
         input_img,
@@ -133,8 +162,11 @@ def remove_background_advanced(input_path, output_path):
     if input_img.mode not in ('RGB', 'RGBA'):
         input_img = input_img.convert('RGB')
 
-    # First pass — ISNet
-    session1 = new_session(model_name='isnet-general-use')
+    # First pass – ISNet
+    session1 = new_session(
+        model_path=get_local_model_path('isnet-general-use'),
+        providers=['CPUExecutionProvider']
+    )
     output1 = remove(
         input_img,
         session=session1,
@@ -145,8 +177,11 @@ def remove_background_advanced(input_path, output_path):
         post_process_mask=True
     )
 
-    # Second pass — U2Net refinement
-    session2 = new_session(model_name='u2net')
+    # Second pass – U2Net refinement
+    session2 = new_session(
+        model_path=get_local_model_path('u2net'),
+        providers=['CPUExecutionProvider']
+    )
     output2 = remove(
         input_img,
         session=session2,
